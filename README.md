@@ -68,3 +68,29 @@ Data Login:
 Email: admin@example.com
 Password: password
 
+-----------
+
+## 📸 Tampilan Aplikasi
+
+**Login Page**  
+![Login Page](screenshot/Login-Page.png)
+
+**Master Barang Page**  
+![Master Barang Page](screenshot/Master-Barang-Page.png)
+
+**Barang Masuk Page**  
+![Barang Masuk Page](screenshot/Barang-Masuk-Page.png)
+
+**Barang Keluar Page**  
+![Barang Keluar Page](screenshot/Barang-Keluar-Page.png)
+
+**Laporan Page**  
+![Laporan Page](screenshot/Laporan-Page.png)
+
+**Modal Tambah Barang**  
+![Modal Tambah Barang](screenshot/Modal-Tambah-Barang.png)
+
+**Modal Tambah Barang Masuk atau Keluar**  
+![Modal Tambah Barang Masuk atau Keluar](screenshot/Modal-Tambah-Barang-Masuk-atau-Keluar.png)
+
+
