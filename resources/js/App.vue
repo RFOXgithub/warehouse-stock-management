@@ -1,12 +1,12 @@
 <template>
   <div class="d-flex">
-    <SideBar />
+    <SideBar v-if="isLoggedIn" @logout="handleLogout" />
 
     <LoadingOverlay :show="isLoading" />
 
     <div class="content flex-grow-1">
       <keep-alive>
-        <router-view />
+        <router-view @login-success="handleLoginSuccess" />
       </keep-alive>
     </div>
   </div>
@@ -14,28 +14,25 @@
 
 <script>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 import SideBar from "./components/SideBar.vue";
 import LoadingOverlay from "./components/LoadingOverlay.vue";
 
 export default {
   components: { SideBar, LoadingOverlay },
   setup() {
+    const isLoggedIn = ref(!!localStorage.getItem("auth_token"));
     const isLoading = ref(false);
-    const router = useRouter();
 
-    router.beforeEach((to, from, next) => {
-      isLoading.value = true;
-      next();
-    });
+    const handleLoginSuccess = () => {
+      isLoggedIn.value = true;
+    };
 
-    router.afterEach(() => {
-      setTimeout(() => {
-        isLoading.value = false;
-      }, 900);
-    });
+    const handleLogout = () => {
+      localStorage.removeItem("auth_token");
+      isLoggedIn.value = false;      
+    };
 
-    return { isLoading };
-  }
+    return { isLoggedIn, isLoading, handleLoginSuccess, handleLogout };
+  },
 };
 </script>

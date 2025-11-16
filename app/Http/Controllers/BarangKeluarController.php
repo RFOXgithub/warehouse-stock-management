@@ -50,6 +50,27 @@ class BarangKeluarController extends Controller
         }
     }
 
+        public function update(Request $request, $id)
+    {
+        $request->validate([
+            'asset_id' => 'required|exists:assets,id',
+            'tanggal' => 'required|date',
+            'jumlah' => 'required|integer|min:1',
+        ]);
+
+        $barang = BarangKeluar::findOrFail($id);
+        $barang->update($request->all());
+        $barang->load('asset');
+        return response()->json($barang);
+    }
+
+    public function destroy($id)
+    {
+        $barang = BarangKeluar::findOrFail($id);
+        $barang->delete();
+        return response()->json(['message' => 'Barang keluar berhasil dihapus']);
+    }
+
     private function createTableIfNotExists()
     {
         if (!Schema::hasTable('barang_keluar')) {

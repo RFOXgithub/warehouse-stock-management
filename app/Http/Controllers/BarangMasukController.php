@@ -34,6 +34,27 @@ class BarangMasukController extends Controller
         return response()->json($barang);
     }
 
+        public function update(Request $request, $id)
+    {
+        $request->validate([
+            'asset_id' => 'required|exists:assets,id',
+            'tanggal'  => 'required|date',
+            'jumlah'   => 'required|integer|min:1',
+        ]);
+
+        $barang = BarangMasuk::findOrFail($id);
+        $barang->update($request->all());
+        $barang->load('asset');
+        return response()->json($barang);
+    }
+
+    public function destroy($id)
+    {
+        $barang = BarangMasuk::findOrFail($id);
+        $barang->delete();
+        return response()->json(['message' => 'Barang masuk berhasil dihapus']);
+    }
+
     private function createTableIfNotExists()
     {
         if (!Schema::hasTable('barang_masuk')) {

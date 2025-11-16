@@ -12,11 +12,17 @@
 
 /* Sidebar umum */
 .sidebar {
+  display: flex;
+  flex-direction: column;
   width: 250px;              /* Lebih ramping */
   height: 100vh;             /* Full height layar */
   padding: 1rem;             /* Spacing dalam sidebar */
   background-color: #f8f9fa; /* Background terang */
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Shadow halus */
+}
+
+.mt-auto {
+  margin-top: auto; 
 }
 
 /* Nav item default */
@@ -118,7 +124,7 @@
 .btn-add {
   margin-bottom: 15px;
   padding: 10px 20px;
-  background-color: #1d4ed8;
+  background-color: #0d6efd;
   color: white;
   border: none;
   border-radius: 8px;
@@ -242,6 +248,24 @@
   cursor: pointer;
 }
 
+/* Tombol Edit */
+.btn-edit {
+  background-color: #FFC107; /* biru */
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 5px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-edit:hover {
+  background-color: #e5ad06; /* biru lebih gelap saat hover */
+  transform: scale(1.05);
+}
+
 .filter-container {
   display: flex;
   align-items: center;
@@ -310,4 +334,39 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.pagination button {
+  background-color: #0d6efd; /* indigo */
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #2563eb;
+  transform: scale(1.05);
+}
+
+.pagination button:disabled {
+  background-color: #a5b4fc; /* lighter indigo */
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: 500;
+  color: #374151; /* gray-700 */
 }

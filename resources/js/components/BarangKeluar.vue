@@ -2,7 +2,7 @@
   <div class="table-container">
     <div class="table-header">
       <h2 class="table-title">Barang Keluar</h2>
-      <button class="btn-add" @click="showModal = true">Tambah Barang Keluar</button>
+      <button class="btn-add" @click="openModal('add')">Tambah Barang Keluar</button>
     </div>
 
     <table class="modern-table">
@@ -13,22 +13,34 @@
           <th>Jumlah Keluar</th>
           <th>Tanggal</th>
           <th>Keterangan</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in keluarList" :key="item.id">
+        <tr v-for="item in paginatedList" :key="item.id">
           <td>{{ item.asset.kode }}</td>
           <td>{{ item.asset.nama }}</td>
           <td>{{ item.jumlah }}</td>
           <td>{{ item.tanggal }}</td>
           <td>{{ item.keterangan }}</td>
+          <td>
+            <button @click="editItem(item)" class="btn-edit">Edit</button>
+            <button @click="deleteItem(item.id)" class="btn-delete">Delete</button>
+          </td>
         </tr>
       </tbody>
     </table>
 
+    <div class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+      <span>Page {{ currentPage }} / {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    </div>
+
+    <!-- Modal -->
     <div class="modal" :class="{ 'modal-active': showModal }">
       <div class="modal-content">
-        <h3>Tambah Barang Keluar</h3>
+        <h3>{{ modalMode === 'add' ? 'Tambah Barang Keluar' : 'Edit Barang Keluar' }}</h3>
 
         <select v-model="form.asset_id">
           <option disabled value="">-- Pilih Barang --</option>
@@ -38,14 +50,7 @@
         </select>
 
         <input type="date" v-model="form.tanggal" />
-
-        <input
-          type="number"
-          v-model.number="form.jumlah"
-          min="1"
-          placeholder="Jumlah Keluar"
-        />
-
+        <input type="number" v-model.number="form.jumlah" min="1" placeholder="Jumlah Keluar" />
         <input type="text" v-model="form.keterangan" placeholder="Keterangan (opsional)" />
 
         <div class="modal-actions">
@@ -78,69 +83,93 @@ export default {
       showModal: false,
       isLoading: false,
       errorMessage: "",
-      form: {
-        asset_id: "",
-        tanggal: "",
-        jumlah: null,
-        keterangan: ""
-      }
+      form: { asset_id: "", tanggal: "", jumlah: null, keterangan: "" },
+      currentPage: 1,
+      perPage: 8,
+      modalMode: "add",
+      editingId: null,
     };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.keluarList.length / this.perPage);
+    },
+    paginatedList() {
+      const start = (this.currentPage - 1) * this.perPage;
+      return this.keluarList.slice(start, start + this.perPage);
+    },
   },
   mounted() {
     this.getAssets();
     this.getBarangKeluar();
   },
   methods: {
+    openModal(mode) {
+      this.modalMode = mode;
+      this.showModal = true;
+      if (mode === "add") this.form = { asset_id: "", tanggal: "", jumlah: null, keterangan: "" };
+    },
     async getAssets() {
-      try {
-        const response = await axios.get("/api/assets");
-        this.assetList = response.data;
-      } catch (error) {
-        console.error("Gagal mengambil daftar barang:", error);
-        this.errorMessage = error.message;
-      }
+      const response = await axios.get("/api/assets");
+      this.assetList = response.data;
     },
     async getBarangKeluar() {
-      try {
-        const response = await axios.get("/api/barang-keluar");
-        this.keluarList = response.data;
-      } catch (error) {
-        console.error("Gagal mengambil barang keluar:", error);
-        this.errorMessage = error.message;
-      }
+      const response = await axios.get("/api/barang-keluar");
+      this.keluarList = response.data;
     },
-    async submitBarangKeluar() {
-      this.errorMessage = "";
-      if (!this.form.asset_id || !this.form.tanggal || !this.form.jumlah) {
-        this.errorMessage = "Lengkapi semua field!";
-        return;
-      }
-      if (this.form.jumlah <= 0) {
-        this.errorMessage = "Jumlah harus lebih dari 0!";
-        return;
-      }
-
+    editItem(item) {
+      this.modalMode = "edit";
+      this.editingId = item.id;
+      this.form = { ...item, asset_id: item.asset_id };
+      this.showModal = true;
+    },
+    async updateItem() {
       this.isLoading = true;
-
       try {
-        console.log("Kirim data:", this.form);
-        const response = await axios.post("/api/barang-keluar", this.form);
-        console.log("Response:", response.data);
-
-        this.keluarList.push(response.data);
-        this.form = { asset_id: "", tanggal: "", jumlah: null, keterangan: "" };
+        const response = await axios.put(`/api/barang-keluar/${this.editingId}`, this.form);
+        const index = this.keluarList.findIndex((i) => i.id === this.editingId);
+        if (index !== -1) this.keluarList.splice(index, 1, response.data);
         this.showModal = false;
       } catch (error) {
-        console.error("Gagal menyimpan barang keluar:", error);
-        if (error.response && error.response.data && error.response.data.error) {
-          this.errorMessage = error.response.data.error;
-        } else {
-          this.errorMessage = "Gagal menyimpan barang keluar!";
-        }
+        console.error(error);
+        this.errorMessage = error.response?.data?.error || "Gagal update barang keluar!";
       } finally {
         this.isLoading = false;
       }
-    }
-  }
+    },
+    async deleteItem(id) {
+      if (!confirm("Yakin ingin menghapus?")) return;
+      try {
+        await axios.delete(`/api/barang-keluar/${id}`);
+        this.keluarList = this.keluarList.filter((i) => i.id !== id);
+      } catch (error) {
+        console.error(error);
+        alert("Gagal menghapus barang keluar!");
+      }
+    },
+    submitBarangKeluar() {
+      if (this.modalMode === "add") {
+        this.createItem();
+      } else {
+        this.updateItem();
+      }
+    },
+    async createItem() {
+      this.isLoading = true;
+      this.errorMessage = "";
+      try {
+        const response = await axios.post("/api/barang-keluar", this.form);
+        this.keluarList.push(response.data);
+        this.showModal = false;
+        this.form = { asset_id: "", tanggal: "", jumlah: null, keterangan: "" };
+      } catch (error) {
+        this.errorMessage = error.response?.data?.error || "Gagal menyimpan barang keluar!";
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    nextPage() { if (this.currentPage < this.totalPages) this.currentPage++; },
+    prevPage() { if (this.currentPage > 1) this.currentPage--; },
+  },
 };
 </script>

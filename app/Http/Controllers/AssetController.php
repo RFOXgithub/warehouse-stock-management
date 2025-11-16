@@ -42,4 +42,27 @@ class AssetController extends Controller
         $asset->delete();
         return response()->json(['message' => 'Asset berhasil dihapus']);
     }
+
+    public function update(Request $request, $id)
+{
+    $asset = Asset::find($id);
+    if (!$asset) {
+        return response()->json(['error' => 'Barang tidak ditemukan'], 404);
+    }
+
+    $request->validate([
+        'nama' => 'required|string',
+        'satuan' => 'required|string',
+        'stock_awal' => 'required|integer|min:0',
+    ]);
+
+    $asset->update([
+        'nama' => $request->nama,
+        'satuan' => $request->satuan,
+        'stock_awal' => $request->stock_awal,
+    ]);
+
+    return response()->json($asset);
+}
+
 }

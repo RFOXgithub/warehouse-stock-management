@@ -1,5 +1,5 @@
 <template>
-      <div class="table-container">
+  <div class="table-container">
     <div class="table-header">
       <h2 class="table-title">Laporan Barang</h2>
     </div>
@@ -22,7 +22,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in laporanList" :key="item.id">
+        <tr v-for="item in paginatedList" :key="item.id">
           <td>{{ item.kode }}</td>
           <td>{{ item.nama }}</td>
           <td>{{ item.stock_awal }}</td>
@@ -32,6 +32,12 @@
         </tr>
       </tbody>
     </table>
+
+    <div class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+      <span>Page {{ currentPage }} / {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    </div>
   </div>
 </template>
 
@@ -45,7 +51,19 @@ export default {
       laporanList: [],
       filterStart: "",
       filterEnd: "",
+      currentPage: 1,
+      perPage: 8, 
     };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.laporanList.length / this.perPage);
+    },
+    paginatedList() {
+      const start = (this.currentPage - 1) * this.perPage;
+      const end = start + this.perPage;
+      return this.laporanList.slice(start, end);
+    },
   },
   mounted() {
     this.getLaporan();
@@ -59,14 +77,19 @@ export default {
 
         const response = await axios.get("http://127.0.0.1:8000/api/laporan", { params });
         this.laporanList = response.data;
-        console.log("Data laporan:", response.data);
       } catch (error) {
         console.error("Gagal mengambil laporan:", error);
       }
     },
     filterLaporan() {
-      console.log("Filter tanggal:", this.filterStart, this.filterEnd);
+      this.currentPage = 1;
       this.getLaporan(this.filterStart, this.filterEnd);
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) this.currentPage++;
+    },
+    prevPage() {
+      if (this.currentPage > 1) this.currentPage--;
     },
   },
 };
