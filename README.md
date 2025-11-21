@@ -56,10 +56,15 @@ Frontend:
 - Configurasi database pada .env (Sesuaikan dengan database yang digunakan)
 
 DB_CONNECTION=mysql
+
 DB_HOST=127.0.0.1
+
 DB_PORT=3306
+
 DB_DATABASE=elitechintern
+
 DB_USERNAME=root
+
 DB_PASSWORD=
 
 - Pada CMD masukan (php artisan key:generate)
@@ -67,8 +72,11 @@ DB_PASSWORD=
 - Lakukan pembersihkan cache jika di perlukan
 
 php artisan config:clear
+
 php artisan cache:clear
+
 php artisan route:clear
+
 php artisan view:clear
 
 - Masukan (npm install) pada CMD
