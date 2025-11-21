@@ -51,10 +51,27 @@ Frontend:
 
 3. Instal Node.js v25.2.0, PHP 8.2.12, NPM 11.6.2
 
-4. Install beberapa Depedency pada CMD (Jika diperlukan)
-- composer install
-- php artisan key:generate
-- npm install
+4. Install beberapa Depedency pada CMD, Path sesuaikan dengan folder repository
+- Ubah .env.example menjadi .env
+- Configurasi database pada .env (Sesuaikan dengan database yang digunakan)
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=elitechintern
+DB_USERNAME=root
+DB_PASSWORD=
+
+- Pada CMD masukan (php artisan key:generate)
+- Kemudian masukan lagi (composer install) pada CMD
+- Lakukan pembersihkan cache jika di perlukan
+
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
+
+- Masukan (npm install) pada CMD
 
 5. Jalankan perintah untuk hidupin server Laravel dan Vue.js pada dua CMD
 - php artisan serve (Laravel)
